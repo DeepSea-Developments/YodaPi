@@ -28,4 +28,3 @@ A thermal camera solution -> www.termodeep.com
 <img src="https://i.ytimg.com/vi/NKib-1CkmDg/hqdefault.jpg">
 
 ### Door access controller (in progress)
-A 
