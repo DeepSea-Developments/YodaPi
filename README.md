@@ -21,6 +21,8 @@ The objetive is to deploy very fast projects on raspberry pi that needs databsas
 * Lightweight database is used. *SQLite* managed with python <a href="https://www.sqlalchemy.org/">sqlalchemy</a>
 * Python's <a href="https://flask.palletsprojects.com/en/1.1.x/">Flask</a> is used to serve a webpage. Using <a href="https://jinja.palletsprojects.com/en/2.11.x/">Jinja</a> templates to make everything more organized.
 * Using <a href="https://getbootstrap.com/docs/4.3/getting-started/introduction/">Bootstrap</a> for making fast webpages. (even though not sure if its the best option for embedded systems)
+* Integrated with <a href="https://sentry.io/">Sentry<a/> to be able to track errors on deployed devices.
+* Python's <a href="https://docs.python.org/3/library/configparser.html">configparser</a> integrated for saving parameters or have "restor from factory" options.
 
 * [near future] Flutter app that connects via bluetooth with the raspberry pi to set wifi network or to send more information/data.
 
