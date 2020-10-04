@@ -1,4 +1,4 @@
-# YodaPi
+# YodaPi - An open source Raspberry pi framework to deploy faster your projects!
 <img src='https://images-na.ssl-images-amazon.com/images/I/516oRhx3HoL._AC_SL1153_.jpg' width="35%" >
 
 YodaPi (pronounced YODA as in star wars' yoda, and PI as in raspberry pi) is a framework (or base project?) to develop professional applications for raspberry pi without the need to go through all the steps of setting up things step by step.
