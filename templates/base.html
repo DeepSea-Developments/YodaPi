@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="google" content="notranslate">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>YodaPi - {% block title %}{% endblock %}</title>
+
+  <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/static/css/global.css">
+  <link rel="stylesheet" href="/static/css/base.css">
+  <script src="/static/js/jquery-3.5.1.min.js"></script>
+  <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+  <script src="/static/js/base.js"></script>
+  {% block head %}			
+  {% endblock %}
+</head>
+
+<body class="bg-dark">
+  <nav class="sidenav">
+    <ul class="list-unstyled components">
+      <li class="text-center {% if 'configuracion' == active_page %} active{% endif %}">
+        <a href="{{ url_for('configuracion') }}"><img src="/static/images/settings.png" /></a>
+      </li>
+      <li class="text-center {% if 'index' == active_page %} active{% endif %}">
+        <a href="{{ url_for('index') }}"><img src="/static/images/camera.png" /></a>
+      </li>
+      <li class="text-center {% if 'registros' == active_page %} active{% endif %}">
+        <a href="{{ url_for('registros') }}"><img src="/static/images/user.png" /></a>
+      </li>
+    </ul>
+    <div class="dsd-logo">
+      <img src="/static/images/verical_logo.png">
+    </div>
+  </nav>
+  <div class="main color-light">
+    <div class="header">
+      <div class="d-flex align-items-center px-3 py-2">
+        <h1 class="color-primary m-0 title">
+          {{ self.title() }}
+        </h1>
+      </div>
+      <div class="d-flex">
+        <div class="termodeep-logo text-right px-3 py-2">
+          <img src="../static/images/termodeep_logo_grey.png"/>
+          <p>Thermal Detection & Access Control System</p>
+        </div>
+        <div class="bg-grey px-3 py-2 color-primary">
+          <p class="m-0 small" id="termodeep_version">Version 1.3</p>
+          <p class="m-0 small">SSID: <span id="ssid"></span></p>
+          <p class="m-0 small">IP: <span id="ip"></span></p>
+        </div>
+      </div>
+    </div>
+    <div>
+      {% block content%}
+      {% endblock %}
+    </div>
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,68 @@
+.main {
+  margin-left: 60px; /* Same as the width of the sidenav */
+  height: 100%;
+}
+
+.header {
+  background: #202020;
+  display: flex;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 300;
+}
+
+.termodeep-logo img {
+  width: 200px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.termodeep-logo p {
+  color: #808080;
+  margin: 0px;
+}
+
+.sidenav {
+  height: 100%;
+  width: 60px;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  overflow-x: hidden;
+  padding-top: 20px;
+  background: #303030;
+}
+
+.sidenav ul li a {
+  padding: 10px;
+  font-size: 1.1em;
+  display: block;
+}
+
+.sidenav ul li a img {
+  width: 30px;
+}
+
+.sidenav ul li a:hover {
+  background: #6d7fcc;
+}
+
+.sidenav ul li.active>a,a[aria-expanded="true"] {
+  color: #fff;
+  background: #6d7fcc;
+}
+
+.dsd-logo {
+  padding: 7px;
+  position: absolute;
+  bottom: 10px;
+}
+
+.dsd-logo img{
+  width: 100%;
+  filter: brightness(0) invert(1);
+}

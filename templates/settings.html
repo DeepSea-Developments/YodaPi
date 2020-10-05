@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% set active_page = 'configuracion' %}
+{% block title%}Configuración{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="/static/css/settings.css">
+<script src="/static/js/settings.js"></script>
+{% endblock %}
+{% block content %}
+
+
+<div class="mx-4 my-4">
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a class="nav-link active" data-toggle="tab" href="#network-settings">Configuración de conexión</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-toggle="tab" href="#settings-advance">Configuración avanzada</a>
+    </li>
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content" id="myTabContent">
+    <div class="tab-pane m-4 active" id="network-settings">
+      {% include 'settings/network.html' %}
+    </div>
+    <div class="tab-pane m-4 fade" id="settings-advance">
+      {% include 'settings/camera_parameters.html' %}
+    </div>
+    <div class="tab-pane m-4 fade" id="menu2">...</div>
+  </div>
+</div>
+
+
+{% endblock %}

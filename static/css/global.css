@@ -1,0 +1,33 @@
+.bg-dark {
+  background: #1a1a1a !important;
+}
+
+.bg-grey {
+  background: #303030 !important;
+}
+
+.color-primary {
+  color: #6d7fcc !important;
+}
+
+.color-grey {
+  color: #808080
+}
+
+.color-light {
+  color: #ddd
+}
+
+.lh-0 {
+  line-height: 0;
+}
+
+a {
+  color: #6d7fcc;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color:  #6d7fcc;
+  border-color:  #6d7fcc;
+}

@@ -1,0 +1,35 @@
+<!-- Form con los parametros de configuracion -->
+
+<form id="form_camera_parameters">
+    <div class="form-row">
+        <div class="form-group col-md-4">
+            <label for="REF_TEMP">Temperatura de referencia</label>
+            <input type="number" step="any" class="form-control" id="REF_TEMP" placeholder="Temperatura de referencia" required>
+        </div>
+        <div class="form-group col-md-4">
+            <label for="CAM_SENSITIVITY">Sensibilidad de la camara</label>
+            <input type="number" step="any"class="form-control" id="CAM_SENSITIVITY" placeholder="Sensibilidad de la camara" required>
+        </div>
+        <div class="form-group col-md-4">
+            <label for="THRESHOLD_HUMAN_TEMP">Umbral de temperatura humana</label>
+            <input type="number" step="any" class="form-control" id="THRESHOLD_HUMAN_TEMP" placeholder="Umbral de temperatura humana" required>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-4">
+            <label for="ALERT_WARNING_TEMP">Alerta de temperatura</label>
+            <input type="number" step="any" class="form-control" id="ALERT_WARNING_TEMP" placeholder="Alerta de temperatura" required>
+        </div>
+        <div class="form-group col-md-4">
+            <label for="ALERT_DANGER_TEMP">Alerta de temperatura critica</label>
+            <input type="number" step="any" class="form-control" id="ALERT_DANGER_TEMP" placeholder="Alerta de temperatura critica" required>
+        </div>
+        <div class="form-group col-md-4">
+            <label for="CAPTURE_DELAY">Delay en la captura</label>
+            <input type="number" step="any" class="form-control" id="CAPTURE_DELAY" placeholder="Delay en la captura" required>
+        </div>
+    </div>
+    <button type="button" class="btn btn-primary" onclick="javascript:updateParameters()">Aplicar parametros</button>
+    <button type="button" class="btn btn-secondary" onclick="javascript:getParameters_default()">Restablecer valores</button>
+</form>
+    
