@@ -74,7 +74,7 @@ if __name__ == '__main__':
     yserver.start()
 
     if not args.simulator:  # Use in RPI
-        sentry_sdk.init(conf.sentry_url)
+        #sentry_sdk.init(conf.get("sentry_url"))
         #start_stream()
 
         door_actuator = DoorActuator("/door/actuator")
