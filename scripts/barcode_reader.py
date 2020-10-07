@@ -5,13 +5,13 @@ import json
 import re
 import threading
 import lzstring
-import requests
+#import requests
 import serial
 from enum import Enum
 from time import sleep
 from datetime import datetime
 from scripts.helpers import get_args, get_ports
-
+from scripts.ymq import YPubNode
 
 class Person:
     def __init__(self, identification=None, name=None, last_name=None, gender=None, birth_date=None, blood_type=None,
@@ -48,7 +48,7 @@ class BarcodeReader:
     initiated = False
     args = None
 
-    def __init__(self, port=None, baudrate=115200):
+    def __init__(self, port=None, baudrate=115200, topic=""):
         if port is None:
             ports = get_ports()
             for (com, desc, vid) in zip(ports[0], ports[1], ports[2]):
@@ -63,6 +63,8 @@ class BarcodeReader:
             except Exception as e:
                 print(e)
             self.args = get_args()
+
+        self.node = YPubNode(topic)
 
     def __del__(self):
         self.serial.close()
@@ -206,7 +208,8 @@ class BarcodeReader:
         while True:
             reading = self.get_reading()
             if reading:
-                requests.post('http://127.0.0.1:8080/barcode_scan', json=reading)
+                #requests.post('http://127.0.0.1:8080/barcode_scan', json=reading)
+                self.node.post(reading)
 
     def start(self):
         """Start the background simulator thread if it isn't running yet."""

@@ -7,10 +7,11 @@ from scripts.barcode_reader import BarcodeReader
 from scripts.cloud_synchronizer import CloudSynchronizer
 from scripts.helpers import get_args, disable_logging, load_config
 from yodapi_flask import flask_main
+from app.door_controller import DoorActuator
 
 import scripts.models
 import scripts.db as db
-
+from scripts.ymq import YServer
 
 def start_stream():
     from scripts.stream_thermal_camera import StreamThermalCamera
@@ -41,6 +42,10 @@ pc_mode = '''
 ----------------------------------------------------
 '''
 
+
+
+
+
 if __name__ == '__main__':
     # Print YodaPi Header
     print(yodapi_header)
@@ -65,12 +70,17 @@ if __name__ == '__main__':
     else:
         db.init(conf.get('db_path'))
 
+    yserver = YServer(verbose=True)
+    yserver.start()
+
     if not args.simulator:  # Use in RPI
         sentry_sdk.init(conf.sentry_url)
-        start_stream()
-        barcode_reader = BarcodeReader()
+        #start_stream()
+
+        door_actuator = DoorActuator("/door/actuator")
+        door_actuator.start()
+
     else:  # Use in Computer
-        barcode_reader = BarcodeReader()
         print(pc_mode)
 
     if args.port:
@@ -84,5 +94,10 @@ if __name__ == '__main__':
     #     cloud = CloudSynchronizer()
     #     cloud.start()
 
-    if barcode_reader.initiated:
-        barcode_reader.start()
+    barcode_in = BarcodeReader(topic="door/barcode/in", port="/dev/ttyACM0")
+    barcode_out = BarcodeReader(topic="door/barcode/out", port="/dev/ttyACM1")
+
+    if barcode_in.initiated:
+        barcode_in.start()
+    if barcode_out.initiated:
+        barcode_out.start()
