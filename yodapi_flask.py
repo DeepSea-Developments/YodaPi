@@ -1,7 +1,6 @@
 import sys
 import os
 
-
 import json
 import scripts.hotspot_manager as hpm
 import configparser
@@ -210,7 +209,7 @@ def wifi_settings():
 def set_camera_parameters():
     data = request.json
 
-    #Use a config file
+    # Use a config file
     config = configparser.ConfigParser()
     config.read('/opt/termodeep/conf/termodeep.ini')
 
@@ -244,13 +243,12 @@ def set_camera_parameters():
 
 @app.route('/get_parameters_default')
 def get_parameters_default():
-
-    #Use a config file
+    # Use a config file
     config = configparser.ConfigParser()
     config.read('/opt/termodeep/conf/termodeep.ini')
     conf = config['DEFAULT']
-    
-    #Default parameters
+
+    # Default parameters
     REF_TEMP = conf.get('REF_TEMP')
     CAM_SENSITIVITY = conf.get('CAM_SENSITIVITY')
     THRESHOLD_HUMAN_TEMP = conf.get('THRESHOLD_HUMAN_TEMP')
@@ -269,14 +267,14 @@ def get_parameters_default():
 
     return jsonify(data)
 
-#cfernandez - 01/10/2020
+
+# cfernandez - 01/10/2020
 @app.route('/get_parameters_last')
 def get_parameters_last():
-
-    #Use a config file
+    # Use a config file
     conf = load_config()
-    
-    #Default parameters
+
+    # Default parameters
     REF_TEMP = conf.get('REF_TEMP')
     CAM_SENSITIVITY = conf.get('CAM_SENSITIVITY')
     THRESHOLD_HUMAN_TEMP = conf.get('THRESHOLD_HUMAN_TEMP')
@@ -296,14 +294,11 @@ def get_parameters_last():
     return jsonify(data)
 
 
+# Main app
+def flask_main(port=8080):
+    # init_db(app)
 
-
-#Main app
-def flask_main():
-    init_db(app)
-
-    # App.run(host='0.0.0.0', port='80', threaded=True)
-    app.run(host='0.0.0.0', port=8080, threaded=True)
+    app.run(host='0.0.0.0', port=port, threaded=True)
 
     # Start camera thread
     CameraThermal()

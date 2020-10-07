@@ -6,7 +6,9 @@ import sentry_sdk
 from scripts.barcode_reader import BarcodeReader
 from scripts.cloud_synchronizer import CloudSynchronizer
 from scripts.helpers import get_args, disable_logging, load_config
-from termodeep_flask import flask_main
+from yodapi_flask import flask_main
+
+import scripts.models
 import scripts.db as db
 
 
@@ -71,7 +73,10 @@ if __name__ == '__main__':
         barcode_reader = BarcodeReader()
         print(pc_mode)
 
-    flask_thread = threading.Thread(target=flask_main)
+    if args.port:
+        flask_thread = threading.Thread(target=flask_main, args=[args.port])
+    else:
+        flask_thread = threading.Thread(target=flask_main)
     flask_thread.start()
 
     # # Cloud synchronizer

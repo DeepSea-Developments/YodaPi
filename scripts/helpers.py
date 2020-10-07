@@ -17,8 +17,10 @@ DEFAULT_CONFIG_PATH = './conf/yodapi.ini'
 
 def get_args():
     parser = argparse.ArgumentParser(description='Start Flask Server.')
-    parser.add_argument("-c", "--config-path", help="Path of the configuration file", action="store_true")
-    parser.add_argument("-d", "--db-path", help="Path of the database", action="store_true")
+    parser.add_argument("-c", "--config-path", help="Path of the configuration file", type=str)
+    parser.add_argument("-d", "--db-path", help="Path of the database", type=str)
+    parser.add_argument("-p", "--port", help="Flask port", type=int)
+
 
     parser.add_argument("-z", "--cloud", help="Upload data to cloud", action="store_true")
     parser.add_argument("-u", "--simulator", help="Simulate the RPI", action="store_true")

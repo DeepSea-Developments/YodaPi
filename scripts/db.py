@@ -7,7 +7,7 @@ Base = declarative_base()
 
 def init(db_path='database_v1.db'):
     global engine, session
-    engine = create_engine(f'sqlite:///{db_path}')
+    engine = create_engine(f'sqlite:///{db_path}', echo=True)
     Session = sessionmaker(bind=engine)
     session = Session()
 
