@@ -12,8 +12,8 @@ from datetime import datetime
 from flask import Flask, render_template, Response, request, jsonify, g
 from scripts.database import get_db, dictfetchone, init_db, dictfetchall
 from scripts.helpers import get_mac, stop_camera_thread, load_config
-from scripts.record_completer import RecordCompleter
-from scripts.camera_thermal import CameraThermal
+#from scripts.record_completer import RecordCompleter
+#from scripts.camera_thermal import CameraThermal
 
 MAC_ADDRESS = get_mac()
 
@@ -301,4 +301,4 @@ def flask_main(port=8080):
     app.run(host='0.0.0.0', port=port, threaded=True)
 
     # Start camera thread
-    CameraThermal()
+    #CameraThermal()

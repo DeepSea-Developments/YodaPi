@@ -1,4 +1,7 @@
-import RPi.GPIO as GPIO
+try:
+    import RPi.GPIO as GPIO
+except:
+    pass
 from scripts.ymq import YPubNode, YSubNode
 import time
 from scripts.ymq import YSubNode, YPubNode

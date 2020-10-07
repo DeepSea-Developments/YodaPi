@@ -13,10 +13,10 @@ import scripts.models
 import scripts.db as db
 from scripts.ymq import YServer
 
-def start_stream():
-    from scripts.stream_thermal_camera import StreamThermalCamera
-    thermal_camera_stream = StreamThermalCamera("/dev/ttyS0")
-    thermal_camera_stream.start()
+# def start_stream():
+#     from scripts.stream_thermal_camera import StreamThermalCamera
+#     thermal_camera_stream = StreamThermalCamera("/dev/ttyS0")
+#     thermal_camera_stream.start()
 
 
 yodapi_header = '''
