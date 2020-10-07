@@ -25,7 +25,7 @@ class DoorActuator:
             GPIO.output(self.gpio, False)
         else:
             GPIO.output(self.gpio, True)
-        time.sleep(self.actvation_time)
+        time.sleep(self.activation_time)
         if self.actuator_polarity:
             GPIO.output(self.gpio, True)
         else:
