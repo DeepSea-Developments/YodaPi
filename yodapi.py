@@ -77,7 +77,7 @@ if __name__ == '__main__':
         #sentry_sdk.init(conf.get("sentry_url"))
         #start_stream()
 
-        door_actuator = DoorActuator("/door/actuator")
+        door_actuator = DoorActuator("door/actuator")
         door_actuator.start()
 
     else:  # Use in Computer

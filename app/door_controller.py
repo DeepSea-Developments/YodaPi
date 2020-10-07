@@ -35,7 +35,7 @@ class DoorActuator:
         while True:
             data, topic = self.node.get()
             print(f"DoorActuator topic: {topic} -> message:{data}")
-            if (topic == self.topic):
+            if topic == self.topic:
                 self.open()
 
     def start(self):
