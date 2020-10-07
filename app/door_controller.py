@@ -11,6 +11,7 @@ import threading
 class DoorActuator:
     def __init__(self, topic, actuator_polarity=0, activation_time=3, gpio=26):
         self.gpio = gpio
+        self.topic = topic
         self.node = YSubNode(topic)
         self.activation_time = activation_time
         self.actuator_polarity = actuator_polarity
