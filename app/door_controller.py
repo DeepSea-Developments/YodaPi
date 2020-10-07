@@ -31,6 +31,7 @@ class DoorActuator:
             GPIO.output(self.gpio, False)
 
     def _thread(self):
+        print("DoorActuator init")
         while True:
             data, topic = self.node.get()
             print(f"DoorActuator topic: {topic} -> message:{data}")
