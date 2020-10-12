@@ -7,7 +7,7 @@ from scripts.ymq import YSubNode, YPubNode, YPubSubNode
 import threading
 from datetime import datetime
 from app.api import ApiConnector
-
+import json
 
 class DoorActuator:
     def __init__(self, topic, actuator_polarity=0, activation_time=3, gpio=26, verbose=True):
@@ -67,17 +67,17 @@ class MainDoorController:
         while True:
             message, topic = self.sub_node.get()
             if topic == 'door/barcode/in':
-                print(message)
-                print(message['identification'])
-                r = self.api.open_door(message['identification'], 1)
-                print(r)
-                print(r.text)
+                dict_data = eval(message)
+                print(dict_data['data']['identification'])
+                r = self.api.open_door(dict_data['data']['identification'], 1)
+                if json.loads(r.text)['is_valid']:
+                    self.pub_node.post("open", "door/actuator")
             elif topic == 'door/barcode/out':
                 dict_data = eval(message)
                 print(dict_data['data']['identification'])
                 r = self.api.open_door(dict_data['data']['identification'], 2)
-                print(r)
-                print(r.text)
+                if json.loads(r.text)['is_valid']:
+                    self.pub_node.post("open", "door/actuator")
 
     def start(self):
         self.thread.start()
