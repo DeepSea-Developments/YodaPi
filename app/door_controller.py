@@ -73,9 +73,9 @@ class MainDoorController:
                 print(r)
                 print(r.text)
             elif topic == 'door/barcode/out':
-                print(message)
-                print(message['identification'])
-                r = self.api.open_door(message['identification'], 2)
+                dict_data = eval(message)
+                print(dict_data['data']['identification'])
+                r = self.api.open_door(dict_data['data']['identification'], 2)
                 print(r)
                 print(r.text)
 
