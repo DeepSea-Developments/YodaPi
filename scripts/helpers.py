@@ -9,18 +9,18 @@ import threading
 
 from serial.tools.list_ports import comports
 
-#Set stop signal - camera thread
+# Set stop signal - camera thread
 global stop_camera_thread
 stop_camera_thread = threading.Event()
 
 DEFAULT_CONFIG_PATH = './conf/yodapi.ini'
+
 
 def get_args():
     parser = argparse.ArgumentParser(description='Start Flask Server.')
     parser.add_argument("-c", "--config-path", help="Path of the configuration file", type=str)
     parser.add_argument("-d", "--db-path", help="Path of the database", type=str)
     parser.add_argument("-p", "--port", help="Flask port", type=int)
-
 
     parser.add_argument("-z", "--cloud", help="Upload data to cloud", action="store_true")
     parser.add_argument("-u", "--simulator", help="Simulate the RPI", action="store_true")
@@ -56,15 +56,17 @@ def get_ports():
     ports = (port_device, port_description, port_vid)
     return ports
 
-'''
-Load the configurations of the project
-'''
-def load_config():
 
+def load_config(debug=True):
+    '''
+    Load the configurations of the project
+    '''
     config_path = DEFAULT_CONFIG_PATH
-    args = get_args()
-    if args.config_path:
-        config_path = args.config_path
+    if not debug:
+        args = get_args()
+        if args.config_path:
+            config_path = args.config_path
+
     config = configparser.ConfigParser()
 
     # If file doesn't exist, create config file
