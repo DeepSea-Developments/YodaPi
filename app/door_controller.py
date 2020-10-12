@@ -2,11 +2,11 @@ try:
     import RPi.GPIO as GPIO
 except:
     pass
-from scripts.ymq import YPubNode, YSubNode
 import time
-from scripts.ymq import YSubNode, YPubNode
+from scripts.ymq import YSubNode, YPubNode, YPubSubNode
 import threading
 from datetime import datetime
+from app.api import ApiConnector
 
 
 class DoorActuator:
@@ -49,22 +49,35 @@ class DoorActuator:
     def start(self):
         self.thread.start()
 
-#
-# counter = 0
-# x = ""
-#
-# while 1:
-#
-#     if (ser.in_waiting > 0):
-#         x = ser.readline().decode()
-#         print(x)
-#
-#     if (ser2.in_waiting > 0):
-#         x = ser2.readline().decode()
-#         print(x)
-#     if (x == "GA26923"):
-#         print("OPEN")
-#         GPIO.output(trigger, True)
-#         time.sleep(2.5)
-#         GPIO.output(trigger, False)
-#         x = ""
+
+class MainDoorController:
+    def __init__(self):
+        self.thread = threading.Thread(target=self._thread)
+        self.api = ApiConnector()
+        self.pub_node = YPubNode()
+        topic_list = ["door/barcode/in",
+                      "door/barcode/out",
+                      "door/sensor",
+                      "door/button",
+                      "door/masterbutton"]
+        self.sub_node = YSubNode(topic=topic_list)
+
+    def _thread(self):
+        print("Main Door Controller Init")
+        while True:
+            message, topic = self.sub_node.get()
+            if topic == 'door/barcode/in':
+                print(message)
+                print(message['identification'])
+                r = self.api.open_door(message['identification'], 1)
+                print(r)
+                print(r.text)
+            elif topic == 'door/barcode/out':
+                print(message)
+                print(message['identification'])
+                r = self.api.open_door(message['identification'], 2)
+                print(r)
+                print(r.text)
+
+    def start(self):
+        self.thread.start()
