@@ -132,11 +132,30 @@ class DoorButton:
                     self.node.post('pushed', self.topic)
                     while not GPIO.input(self.gpio):
                         time.sleep(0.5)
-            time.sleep(0.5)
+            time.sleep(0.3)
 
     def start(self):
         self.thread.start()
 
+
+class RemoteDoorControl:
+    def __init__(self, polling_time_in_s = 20):
+        self.sleep_time = polling_time_in_s
+        self.thread = threading.Thread(target=self._thread)
+        self.api = ApiConnector()
+        self.pub_node = YPubNode()
+
+    def _thread(self):
+        print("RemoteDoorControl init")
+        while True:
+            r = self.api.door_status_verification()
+            if json.loads(r.text)['is_open']:
+                self.pub_node.post("open", "door/actuator")
+                r = self.api.close_door()
+            time.sleep(self.sleep_time)
+
+    def start(self):
+        self.thread.start()
 
 class MainDoorController:
     def __init__(self):
