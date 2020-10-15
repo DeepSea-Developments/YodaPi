@@ -154,6 +154,7 @@ class MainDoorController:
         print("Main Door Controller Init")
         while True:
             message, topic = self.sub_node.get()
+            # -------------Open door if available barcode -------------
             if topic == 'door/barcode/in':
                 dict_data = eval(message)
                 print(dict_data['data']['identification'])
@@ -166,6 +167,12 @@ class MainDoorController:
                 r = self.api.open_door(dict_data['data']['identification'], 2)
                 if json.loads(r.text)['is_valid']:
                     self.pub_node.post("open", "door/actuator")
+
+            # -------------Open door if Button or master button pressed-------------
+            elif topic == 'door/button':
+                self.pub_node.post("open", "door/actuator")
+            elif topic == 'door/masterbutton':
+                self.pub_node.post("open", "door/actuator")
 
     def start(self):
         self.thread.start()

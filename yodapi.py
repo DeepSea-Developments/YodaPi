@@ -1,15 +1,12 @@
 import threading
 import os
 import re
-import sentry_sdk
 
 from scripts.barcode_reader import BarcodeReader
-from scripts.cloud_synchronizer import CloudSynchronizer
 from scripts.helpers import get_args, disable_logging, load_config
 from yodapi_flask import flask_main
 from app.door_controller import DoorActuator, MainDoorController, DoorSensor, DoorButton
 
-import scripts.models
 import scripts.db as db
 from scripts.ymq import YServer
 
