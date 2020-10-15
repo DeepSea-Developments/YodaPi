@@ -9,6 +9,7 @@ from datetime import datetime
 from app.api import ApiConnector
 import json
 
+
 class DoorActuator:
     def __init__(self, topic, actuator_polarity=0, activation_time=3, gpio=26, verbose=True):
         self.thread = threading.Thread(target=self._thread)
@@ -45,6 +46,53 @@ class DoorActuator:
             print(f"DoorActuator topic: {topic} -> message:{data}")
             if topic == self.topic:
                 self.open()
+
+    def start(self):
+        self.thread.start()
+
+
+class DoorSensor:
+    def __init__(self, topic='door/sensor', pull_up=1, polarity=0, gpio=2, verbose=True):
+        self.thread = threading.Thread(target=self._thread)
+        self.gpio = gpio
+        self.topic = topic
+        self.polarity = polarity
+        self.pull_up = pull_up
+        self.node = YPubNode(topic)
+        self.polarity = polarity
+        self.verbose = verbose
+        GPIO.setmode(GPIO.BCM)
+
+        if self.pull_up:
+            GPIO.setup(self.gpio, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        else:
+            GPIO.setup(self.gpio, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+
+    def _thread(self):
+        print("DoorSensor init")
+        sensor_state = GPIO.input(self.gpio)
+        while True:
+            if sensor_state != GPIO.input(self.gpio):
+                sensor_state = GPIO.input(self.gpio)
+                if sensor_state:
+                    if self.polarity:
+                        if self.verbose:
+                            print("DoorSensor: Close")
+                        self.node.post('close', self.topic)
+                    else:
+                        if self.verbose:
+                            print("DoorSensor: Open")
+                        self.node.post('open', self.topic)
+                else:
+                    if self.polarity:
+                        if self.verbose:
+                            print("DoorSensor: Open")
+                        self.node.post('open', self.topic)
+                    else:
+                        if self.verbose:
+                            print("DoorSensor: Close")
+                        self.node.post('close', self.topic)
+            time.sleep(0.5)
 
     def start(self):
         self.thread.start()
