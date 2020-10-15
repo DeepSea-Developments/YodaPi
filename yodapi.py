@@ -7,7 +7,7 @@ from scripts.barcode_reader import BarcodeReader
 from scripts.cloud_synchronizer import CloudSynchronizer
 from scripts.helpers import get_args, disable_logging, load_config
 from yodapi_flask import flask_main
-from app.door_controller import DoorActuator, MainDoorController, DoorSensor
+from app.door_controller import DoorActuator, MainDoorController, DoorSensor, DoorButton
 
 import scripts.models
 import scripts.db as db
@@ -77,8 +77,17 @@ if __name__ == '__main__':
         #sentry_sdk.init(conf.get("sentry_url"))
         #start_stream()
 
-        door_actuator = DoorActuator("door/actuator")
+        door_actuator = DoorActuator(topic="door/actuator")
         door_actuator.start()
+
+        door_sensor = DoorSensor(topic="door/sensor")
+        door_sensor.start()
+
+        door_button = DoorButton(topic="door/button", gpio=3)
+        door_button.start()
+
+        door_master_button = DoorButton(topic="door/masterbutton", gpio=4)
+        door_master_button.start()
 
     else:  # Use in Computer
         print(pc_mode)
@@ -105,5 +114,3 @@ if __name__ == '__main__':
     main_door_controller = MainDoorController()
     main_door_controller.start()
 
-    door_sensor = DoorSensor()
-    door_sensor.start()

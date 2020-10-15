@@ -11,7 +11,7 @@ import json
 
 
 class DoorActuator:
-    def __init__(self, topic, actuator_polarity=0, activation_time=3, gpio=26, verbose=True):
+    def __init__(self, topic="door/actuator", actuator_polarity=0, activation_time=3, gpio=26, verbose=True):
         self.thread = threading.Thread(target=self._thread)
         self.gpio = gpio
         self.topic = topic
@@ -92,6 +92,46 @@ class DoorSensor:
                         if self.verbose:
                             print("DoorSensor: Close")
                         self.node.post('close', self.topic)
+            time.sleep(0.5)
+
+    def start(self):
+        self.thread.start()
+
+
+class DoorButton:
+    def __init__(self, topic='door/button', pull_up=1, polarity=0, gpio=3, verbose=True):
+        self.thread = threading.Thread(target=self._thread)
+        self.gpio = gpio
+        self.topic = topic
+        self.polarity = polarity
+        self.pull_up = pull_up
+        self.node = YPubNode(topic)
+        self.polarity = polarity
+        self.verbose = verbose
+        GPIO.setmode(GPIO.BCM)
+
+        if self.pull_up:
+            GPIO.setup(self.gpio, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        else:
+            GPIO.setup(self.gpio, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+
+    def _thread(self):
+        print("DoorButton init")
+        while True:
+            if self.polarity:
+                if GPIO.input(self.gpio):
+                    if self.verbose:
+                        print("DoorButton: pushed")
+                    self.node.post('pushed', self.topic)
+                    while GPIO.input(self.gpio):
+                        time.sleep(0.5)
+            else:
+                if not GPIO.input(self.gpio):
+                    if self.verbose:
+                        print("DoorButton: pushed")
+                    self.node.post('pushed', self.topic)
+                    while not GPIO.input(self.gpio):
+                        time.sleep(0.5)
             time.sleep(0.5)
 
     def start(self):
