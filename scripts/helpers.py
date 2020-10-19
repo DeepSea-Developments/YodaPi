@@ -83,3 +83,12 @@ def load_config(debug=True):
         conf = config['DEFAULT']
 
     return conf
+
+
+def get_parameters_id_list(params):
+    param_list = []
+    for tab in params:
+        for section in tab['tab_data']:
+            for field in section['section_data']:
+                param_list.append(field['param_id'])
+    return param_list

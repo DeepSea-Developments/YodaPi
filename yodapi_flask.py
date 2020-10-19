@@ -11,9 +11,10 @@ from base64 import b64encode
 from datetime import datetime
 from flask import Flask, render_template, Response, request, jsonify, g
 from scripts.database import get_db, dictfetchone, init_db, dictfetchall
-from scripts.helpers import get_mac, stop_camera_thread, load_config
-#from scripts.record_completer import RecordCompleter
-#from scripts.camera_thermal import CameraThermal
+from scripts.helpers import get_mac, stop_camera_thread, load_config, get_parameters_id_list, DEFAULT_CONFIG_PATH
+
+# from scripts.record_completer import RecordCompleter
+# from scripts.camera_thermal import CameraThermal
 
 MAC_ADDRESS = get_mac()
 
@@ -48,7 +49,11 @@ def registros():
 @app.route('/configuracion')
 def configuracion():
     """Settings page."""
-    return render_template('settings.html')
+
+    with open('conf/parameters.json') as param_file:
+        params = json.load(param_file)
+
+    return render_template('settings.html', params=params)
 
 
 def gen(camera):
@@ -205,38 +210,22 @@ def wifi_settings():
     return jsonify(data)
 
 
-@app.route('/camera_parameters', methods=['POST'])
-def set_camera_parameters():
+@app.route('/set_parameters', methods=['POST'])
+def set_parameters():
     data = request.json
 
     # Use a config file
     config = configparser.ConfigParser()
-    config.read('/opt/termodeep/conf/termodeep.ini')
+    config.read(DEFAULT_CONFIG_PATH)
 
-    if 'CUSTOM' in config:
-        config.set('CUSTOM', 'REF_TEMP', str(data['REF_TEMP']))
-        config.set('CUSTOM', 'CAM_SENSITIVITY', str(data['CAM_SENSITIVITY']))
-        config.set('CUSTOM', 'THRESHOLD_HUMAN_TEMP', str(data['THRESHOLD_HUMAN_TEMP']))
-        config.set('CUSTOM', 'ALERT_WARNING_TEMP', str(data['ALERT_WARNING_TEMP']))
-        config.set('CUSTOM', 'ALERT_DANGER_TEMP', str(data['ALERT_DANGER_TEMP']))
-        config.set('CUSTOM', 'CAPTURE_DELAY', str(data['CAPTURE_DELAY']))
-    else:
+    if not ('CUSTOM' in config):
         config.add_section('CUSTOM')
-        config.set('CUSTOM', 'REF_TEMP', str(data['REF_TEMP']))
-        config.set('CUSTOM', 'CAM_SENSITIVITY', str(data['CAM_SENSITIVITY']))
-        config.set('CUSTOM', 'THRESHOLD_HUMAN_TEMP', str(data['THRESHOLD_HUMAN_TEMP']))
-        config.set('CUSTOM', 'ALERT_WARNING_TEMP', str(data['ALERT_WARNING_TEMP']))
-        config.set('CUSTOM', 'ALERT_DANGER_TEMP', str(data['ALERT_DANGER_TEMP']))
-        config.set('CUSTOM', 'CAPTURE_DELAY', str(data['CAPTURE_DELAY']))
 
-    with open('/opt/termodeep/conf/termodeep.ini', 'w') as configfile:
+    for key in data:
+        config.set('CUSTOM', key, str(data[key]))
+
+    with open(DEFAULT_CONFIG_PATH, 'w') as configfile:
         config.write(configfile)
-
-    print('Camera thread restarting ...')
-    stop_camera_thread.set()
-    time.sleep(0.5)
-    stop_camera_thread.clear()
-    CameraThermal()
 
     return jsonify(data)
 
@@ -245,25 +234,37 @@ def set_camera_parameters():
 def get_parameters_default():
     # Use a config file
     config = configparser.ConfigParser()
-    config.read('/opt/termodeep/conf/termodeep.ini')
+    config.read(DEFAULT_CONFIG_PATH)
     conf = config['DEFAULT']
 
-    # Default parameters
-    REF_TEMP = conf.get('REF_TEMP')
-    CAM_SENSITIVITY = conf.get('CAM_SENSITIVITY')
-    THRESHOLD_HUMAN_TEMP = conf.get('THRESHOLD_HUMAN_TEMP')
-    ALERT_WARNING_TEMP = conf.get('ALERT_WARNING_TEMP')
-    ALERT_DANGER_TEMP = conf.get('ALERT_DANGER_TEMP')
-    CAPTURE_DELAY = conf.get('CAPTURE_DELAY')
+    with open('conf/parameters.json') as param_file:
+        params = json.load(param_file)
+    param_id_list = get_parameters_id_list(params)
+    param_value_list = []
+    for id in param_id_list:
+        param_value_list.append(conf.get(id))
 
-    data = {
-        "REF_TEMP": REF_TEMP,
-        "CAM_SENSITIVITY": CAM_SENSITIVITY,
-        "THRESHOLD_HUMAN_TEMP": THRESHOLD_HUMAN_TEMP,
-        "ALERT_WARNING_TEMP": ALERT_WARNING_TEMP,
-        "ALERT_DANGER_TEMP": ALERT_DANGER_TEMP,
-        "CAPTURE_DELAY": CAPTURE_DELAY
-    }
+    data = {}
+    for param, value in zip(param_id_list, param_value_list):
+        data[param] = value
+
+
+    # # Default parameters
+    # REF_TEMP = conf.get('REF_TEMP')
+    # CAM_SENSITIVITY = conf.get('CAM_SENSITIVITY')
+    # THRESHOLD_HUMAN_TEMP = conf.get('THRESHOLD_HUMAN_TEMP')
+    # ALERT_WARNING_TEMP = conf.get('ALERT_WARNING_TEMP')
+    # ALERT_DANGER_TEMP = conf.get('ALERT_DANGER_TEMP')
+    # CAPTURE_DELAY = conf.get('CAPTURE_DELAY')
+    #
+    # data = {
+    #     "REF_TEMP": REF_TEMP,
+    #     "CAM_SENSITIVITY": CAM_SENSITIVITY,
+    #     "THRESHOLD_HUMAN_TEMP": THRESHOLD_HUMAN_TEMP,
+    #     "ALERT_WARNING_TEMP": ALERT_WARNING_TEMP,
+    #     "ALERT_DANGER_TEMP": ALERT_DANGER_TEMP,
+    #     "CAPTURE_DELAY": CAPTURE_DELAY
+    # }
 
     return jsonify(data)
 
@@ -274,22 +275,33 @@ def get_parameters_last():
     # Use a config file
     conf = load_config()
 
-    # Default parameters
-    REF_TEMP = conf.get('REF_TEMP')
-    CAM_SENSITIVITY = conf.get('CAM_SENSITIVITY')
-    THRESHOLD_HUMAN_TEMP = conf.get('THRESHOLD_HUMAN_TEMP')
-    ALERT_WARNING_TEMP = conf.get('ALERT_WARNING_TEMP')
-    ALERT_DANGER_TEMP = conf.get('ALERT_DANGER_TEMP')
-    CAPTURE_DELAY = conf.get('CAPTURE_DELAY')
+    with open('conf/parameters.json') as param_file:
+        params = json.load(param_file)
+    param_id_list = get_parameters_id_list(params)
+    param_value_list = []
+    for id in param_id_list:
+        param_value_list.append(conf.get(id))
 
-    data = {
-        "REF_TEMP": REF_TEMP,
-        "CAM_SENSITIVITY": CAM_SENSITIVITY,
-        "THRESHOLD_HUMAN_TEMP": THRESHOLD_HUMAN_TEMP,
-        "ALERT_WARNING_TEMP": ALERT_WARNING_TEMP,
-        "ALERT_DANGER_TEMP": ALERT_DANGER_TEMP,
-        "CAPTURE_DELAY": CAPTURE_DELAY
-    }
+    data = {}
+    for param, value in zip(param_id_list, param_value_list):
+        data[param] = value
+
+    # # Default parameters
+    # REF_TEMP = conf.get('REF_TEMP')
+    # CAM_SENSITIVITY = conf.get('CAM_SENSITIVITY')
+    # THRESHOLD_HUMAN_TEMP = conf.get('THRESHOLD_HUMAN_TEMP')
+    # ALERT_WARNING_TEMP = conf.get('ALERT_WARNING_TEMP')
+    # ALERT_DANGER_TEMP = conf.get('ALERT_DANGER_TEMP')
+    # CAPTURE_DELAY = conf.get('CAPTURE_DELAY')
+    #
+    # data = {
+    #     "REF_TEMP": REF_TEMP,
+    #     "CAM_SENSITIVITY": CAM_SENSITIVITY,
+    #     "THRESHOLD_HUMAN_TEMP": THRESHOLD_HUMAN_TEMP,
+    #     "ALERT_WARNING_TEMP": ALERT_WARNING_TEMP,
+    #     "ALERT_DANGER_TEMP": ALERT_DANGER_TEMP,
+    #     "CAPTURE_DELAY": CAPTURE_DELAY
+    # }
 
     return jsonify(data)
 
@@ -301,4 +313,4 @@ def flask_main(port=8080):
     app.run(host='0.0.0.0', port=port, threaded=True)
 
     # Start camera thread
-    #CameraThermal()
+    # CameraThermal()

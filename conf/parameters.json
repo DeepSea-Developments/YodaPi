@@ -1,0 +1,74 @@
+[
+  {
+    "tab_name": "Cloud configuration",
+    "tab_id": "cloud-configuration",
+    "tab_data": [
+      {
+        "section_name": "Basic configurations",
+        "section_data": [
+          {
+            "param_id": "api_url",
+            "param_name": "API Url",
+            "param_type": "text"
+          },
+          {
+            "param_id": "door_id",
+            "param_name": "Door ID",
+            "param_type": "text"
+          }
+        ]
+      },
+      {
+        "section_name": "Advance configurations",
+        "section_data": [
+          {
+            "param_id": "api_token",
+            "param_name": "API Token",
+            "param_type": "text"
+          },
+          {
+            "param_id": "api_get_users",
+            "param_name": "User database endpoint",
+            "param_type": "text"
+          },
+          {
+            "param_id": "api_get_open_door",
+            "param_name": "Check user access endpoint",
+            "param_type": "text"
+          },
+          {
+            "param_id": "api_get_remote_open",
+            "param_name": "Remote Door control endpoint",
+            "param_type": "text"
+          },
+          {
+            "param_id": "api_post_close",
+            "param_name": "Door close report endpoint",
+            "param_type": "text"
+          },
+          {
+            "param_id": "api_get_db_changes",
+            "param_name": "Database last change endpoint",
+            "param_type": "text"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "tab_name": "Door configuration",
+    "tab_id": "door-configuration",
+    "tab_data": [
+      {
+        "section_name": "Basic configurations",
+        "section_data": [
+          {
+            "param_id": "actuator_time",
+            "param_name": "Door actuator time",
+            "param_type": "number"
+          }
+        ]
+      }
+    ]
+  }
+]
