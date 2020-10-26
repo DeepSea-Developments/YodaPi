@@ -1,6 +1,7 @@
 import threading
 import os
 import re
+import platform
 
 from scripts.barcode_reader import BarcodeReader
 from scripts.helpers import get_args, disable_logging, load_config
@@ -57,7 +58,7 @@ if __name__ == '__main__':
     disable_logging()
 
     # Review if running on PC or in Raspberry, to run in simulator mode or not
-    os_info = os.uname()
+    os_info = platform.platform()
     if not (re.search(r'arm', os_info[4])):
         args.simulator = True
 

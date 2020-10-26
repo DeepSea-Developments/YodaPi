@@ -37,7 +37,7 @@ def close_connection(exception):
 @app.route('/')
 def index():
     """Video streaming home page."""
-    return render_template('index.html')
+    return render_template('records.html')
 
 
 @app.route('/registros')

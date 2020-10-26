@@ -1,13 +1,13 @@
 .bg-dark {
-  background: #1a1a1a !important;
+  background: #e8e8e8 !important;
 }
 
 .bg-grey {
-  background: #303030 !important;
+  background: #000000 !important;
 }
 
 .color-primary {
-  color: #6d7fcc !important;
+  color: #eceff1 !important;
 }
 
 .color-grey {
@@ -15,7 +15,7 @@
 }
 
 .color-light {
-  color: #ddd
+  color: #000
 }
 
 .lh-0 {
@@ -24,6 +24,10 @@
 
 a {
   color: #6d7fcc;
+}
+
+.h1 {
+ color: #000 !important;
 }
 
 .btn-primary {
