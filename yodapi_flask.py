@@ -19,7 +19,7 @@ import pathlib
 
 MAC_ADDRESS = get_mac()
 
-DEFAULT_PARAMETERS_PATH = pathlib.Path(__file__).parent / '../conf/parameters.json'
+DEFAULT_PARAMETERS_PATH = pathlib.Path(__file__).parent / 'conf/parameters.json'
 
 
 if getattr(sys, 'frozen', False):
