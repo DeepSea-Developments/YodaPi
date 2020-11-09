@@ -1,7 +1,8 @@
 import requests
 
 from scripts.helpers import load_config
-
+from scripts.barcode_reader import BarcodeType
+import base64
 
 class ApiConnector:
     def __init__(self):
@@ -17,7 +18,8 @@ class ApiConnector:
 
         # api endpoints
         self.api_get_users = self.conf.get('api_get_users')
-        self.api_get_open_door = self.conf.get("api_get_open_door")
+        self.api_get_open_door_id = self.conf.get("api_get_open_door_id")
+        self.api_get_open_door_qr = self.conf.get("api_get_open_door_qr")
         self.api_get_remote_open = self.conf.get("api_get_remote_open")
         self.api_post_close = self.conf.get("api_post_close")
         self.api_get_db_changes = self.conf.get("api_get_db_changes")
@@ -30,11 +32,17 @@ class ApiConnector:
                          headers=self.headers)
         return r
 
-    def open_door(self, document, door_dir):
+    def open_door(self, document, door_dir, barcode_type, qr_code=""):
+        print(qr_code)
+        base64_qr = base64.b64encode(qr_code.encode("ascii")).decode("utf-8")
         params = {'id_door': self.door_id,
                   'document': document,
-                  'action': door_dir}
-        url = self.url + self.api_get_open_door.format(**params)
+                  'action': door_dir,
+                  'qr_base64': base64_qr}
+        if barcode_type == BarcodeType.QR.value:
+            url = self.url + self.api_get_open_door_qr.format(**params)
+        else:
+            url = self.url + self.api_get_open_door_id.format(**params)
         print(url)
         r = requests.get(url,
                          headers=self.headers)

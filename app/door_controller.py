@@ -4,6 +4,7 @@ except:
     pass
 import time
 from scripts.ymq import YSubNode, YPubNode, YPubSubNode
+from scripts.barcode_reader import BarcodeType
 import threading
 from datetime import datetime
 from app.api import ApiConnector
@@ -171,27 +172,52 @@ class MainDoorController:
 
     def _thread(self):
         print("Main Door Controller Init")
+        barcode_message = False
         while True:
             message, topic = self.sub_node.get()
+
+
             # -------------Open door if available barcode -------------
             if topic == 'door/barcode/in':
-                dict_data = eval(message)
-                print(dict_data['data']['identification'])
-                r = self.api.open_door(dict_data['data']['identification'], 1)
-                if json.loads(r.text)['is_valid']:
-                    self.pub_node.post("open", "door/actuator")
+                door_dir = 1
+                barcode_message = True
             elif topic == 'door/barcode/out':
-                dict_data = eval(message)
-                print(dict_data['data']['identification'])
-                r = self.api.open_door(dict_data['data']['identification'], 2)
-                if json.loads(r.text)['is_valid']:
-                    self.pub_node.post("open", "door/actuator")
+                door_dir = 2
+                barcode_message = True
 
             # -------------Open door if Button or master button pressed-------------
             elif topic == 'door/button':
                 self.pub_node.post("open", "door/actuator")
             elif topic == 'door/masterbutton':
                 self.pub_node.post("open", "door/actuator")
+
+            # ------------- Evaluate barcode reading -------------
+            if barcode_message:
+                dict_data = eval(message)
+
+                if "barcode_type" in dict_data.keys():
+                    # ------------- Evaluate QR codes -------------
+                    if dict_data["barcode_type"] == BarcodeType.QR.value:
+                        print("Reading QR")
+                        r = self.api.open_door(dict_data['data']['identification'],
+                                               door_dir,
+                                               dict_data["barcode_type"],
+                                               dict_data["data"]["extra_txt"])
+                        if json.loads(r.text)['is_valid']:
+                            self.pub_node.post("open", "door/actuator")
+                        else:
+                            print(f"{dict_data['data']['name']} Not valid")
+                    # ------------- Evaluate Cedula codes -------------
+                    elif dict_data["barcode_type"] == BarcodeType.CEDULA_COLOMBIA.value:
+                        print("Reading Cedula")
+                        r = self.api.open_door(dict_data['data']['identification'],
+                                               door_dir,
+                                               dict_data["barcode_type"])
+                        if json.loads(r.text)['is_valid']:
+                            self.pub_node.post("open", "door/actuator")
+                        else:
+                            print(f"{dict_data['data']['name']} Not valid")
+                barcode_message = False
 
     def start(self):
         self.thread.start()

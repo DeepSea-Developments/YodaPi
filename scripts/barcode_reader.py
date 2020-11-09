@@ -12,6 +12,7 @@ from time import sleep
 from datetime import datetime
 from scripts.helpers import get_args, get_ports
 from scripts.ymq import YPubNode
+import base64
 
 class Person:
     def __init__(self, identification=None, name=None, last_name=None, gender=None, birth_date=None, blood_type=None,
@@ -86,8 +87,6 @@ class BarcodeReader:
         return string_data
 
     def get_reading(self):
-        # msg = self.serial.readline()
-        # if msg:
 
         if self.serial.in_waiting > 0:
             msg = []
@@ -95,10 +94,6 @@ class BarcodeReader:
             for i in range(data_size):
                 value = self.serial.read()
                 msg.append(value)
-            # print(msg)
-            # print(len(msg))
-
-            # msg = [msg[i:i + 1] for i in range(0, len(msg), 1)]
 
             # TODO improve code type detection  to allow qr codes of length 531 and 700
             if len(msg) == 531:
@@ -148,58 +143,28 @@ class BarcodeReader:
                     data = person.__dict__
 
                 elif code_type == BarcodeType.QR:
-                    decoded_data = (''.join(self._decode_string_iso_8859_1(msg)))
-
-                    if decoded_data.startswith('DSD:'):
-                        code_type = BarcodeType.QR_DSD
-                        x = lzstring.LZString()
-                        base64data = decoded_data[4:]
-                        json_string = x.decompressFromBase64(base64data)
-
-                        data_dict = json.loads(json_string)
-                        identification = data_dict['id']
-                        name = data_dict['fn']
-                        last_name = data_dict['ln']
-
-                        data_dict.pop('id', None)
-                        data_dict.pop('fn', None)
-                        data_dict.pop('ln', None)
-
-                        alert = False
-                        for key in data_dict:
-                            if key.startswith('r'):
-                                response_number = key[1:]
-                                alert_key = 'a' + response_number
-                                if alert_key in data_dict and data_dict[alert_key] == data_dict[key]:
-                                    alert = True
-                                    break
-
-                        person = Person(
-                            identification=identification,
-                            name=name,
-                            last_name=last_name,
-                            extra_json=data_dict,
-                            alert=alert
-                        )
-                        data = person.__dict__
-
-                    elif self.args.qrexternal:
-                        person = Person(
-                            extra_txt=decoded_data
-                        )
-                        data = person.__dict__
-
+                    # This implementations expects QR codes in json format, encoded in base 64
+                    base64_data = (''.join(self._decode_string_iso_8859_1(msg)))
+                    print(base64_data)
+                    decoded_data = base64.b64decode(base64_data).decode('utf-8')
+                    try:
+                        msg_json = json.loads(decoded_data)
+                    except Exception as e:
+                        print("Error. Not a valid json. error:", e)
+                    person = Person(
+                        name=msg_json["name"],
+                        identification=msg_json["document"],
+                        extra_txt=json.dumps(msg_json)
+                    )
+                    data = person.__dict__
                 if data is not None:
                     return {
                         'barcode_type': code_type.value,
                         'data': data,
                         'timestamp': datetime.now().isoformat()
                     }
-                else:
-                    print('External QR not enabled')
-                    return None
             except Exception as e:
-                print(e)
+                print("Bardcode Error: ",e)
                 return
         else:
             sleep(0.1)
@@ -208,7 +173,6 @@ class BarcodeReader:
         while True:
             reading = self.get_reading()
             if reading:
-                #requests.post('http://127.0.0.1:8080/barcode_scan', json=reading)
                 self.node.post(reading)
 
     def start(self):

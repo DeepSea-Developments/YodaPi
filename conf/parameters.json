@@ -32,8 +32,13 @@
             "param_type": "text"
           },
           {
-            "param_id": "api_get_open_door",
-            "param_name": "Check user access endpoint",
+            "param_id": "api_get_open_door_id",
+            "param_name": "Check user access endpoint (ID)",
+            "param_type": "text"
+          },
+          {
+            "param_id": "api_get_open_door_qr",
+            "param_name": "Check user access endpoint (QR)",
             "param_type": "text"
           },
           {
