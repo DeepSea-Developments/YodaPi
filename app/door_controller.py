@@ -23,20 +23,20 @@ class DoorActuator:
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.gpio, GPIO.OUT)
         if self.actuator_polarity:
-            GPIO.output(self.gpio, True)
+            GPIO.output(self.gpio, GPIO.HIGH)
 
     def open(self):
         if self.actuator_polarity:
-            GPIO.output(self.gpio, False)
+            GPIO.output(self.gpio, GPIO.LOW)
         else:
-            GPIO.output(self.gpio, True)
+            GPIO.output(self.gpio, GPIO.HIGH)
         if self.verbose:
             print(f"{datetime.now()}: DoorActuator: Activated")
         time.sleep(self.activation_time)
         if self.actuator_polarity:
-            GPIO.output(self.gpio, True)
+            GPIO.output(self.gpio, GPIO.HIGH)
         else:
-            GPIO.output(self.gpio, False)
+            GPIO.output(self.gpio, GPIO.LOW)
         if self.verbose:
             print(f"{datetime.now()}: DoorActuator: Deactivated")
 
