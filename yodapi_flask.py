@@ -12,11 +12,15 @@ from datetime import datetime
 from flask import Flask, render_template, Response, request, jsonify, g
 from scripts.database import get_db, dictfetchone, init_db, dictfetchall
 from scripts.helpers import get_mac, stop_camera_thread, load_config, get_parameters_id_list, DEFAULT_CONFIG_PATH
+import pathlib
 
 # from scripts.record_completer import RecordCompleter
 # from scripts.camera_thermal import CameraThermal
 
 MAC_ADDRESS = get_mac()
+
+DEFAULT_PARAMETERS_PATH = pathlib.Path(__file__).parent / '../conf/parameters.json'
+
 
 if getattr(sys, 'frozen', False):
     template_folder = os.path.join(sys._MEIPASS, 'templates')
@@ -50,7 +54,7 @@ def registros():
 def configuracion():
     """Settings page."""
 
-    with open('conf/parameters.json') as param_file:
+    with open(DEFAULT_PARAMETERS_PATH) as param_file:
         params = json.load(param_file)
 
     return render_template('settings.html', params=params)
@@ -237,7 +241,7 @@ def get_parameters_default():
     config.read(DEFAULT_CONFIG_PATH)
     conf = config['DEFAULT']
 
-    with open('conf/parameters.json') as param_file:
+    with open(DEFAULT_PARAMETERS_PATH) as param_file:
         params = json.load(param_file)
     param_id_list = get_parameters_id_list(params)
     param_value_list = []
@@ -275,7 +279,7 @@ def get_parameters_last():
     # Use a config file
     conf = load_config()
 
-    with open('conf/parameters.json') as param_file:
+    with open(DEFAULT_PARAMETERS_PATH) as param_file:
         params = json.load(param_file)
     param_id_list = get_parameters_id_list(params)
     param_value_list = []

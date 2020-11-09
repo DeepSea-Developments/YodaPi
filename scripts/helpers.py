@@ -14,7 +14,6 @@ from serial.tools.list_ports import comports
 global stop_camera_thread
 stop_camera_thread = threading.Event()
 
-#DEFAULT_CONFIG_PATH = './conf/yodapi.ini'
 DEFAULT_CONFIG_PATH = pathlib.Path(__file__).parent / '../conf/yodapi.ini'
 
 def get_args():
