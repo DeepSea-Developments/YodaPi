@@ -40,10 +40,6 @@ pc_mode = '''
 ----------------------------------------------------
 '''
 
-
-
-
-
 if __name__ == '__main__':
     # Print YodaPi Header
     print(yodapi_header)
@@ -59,8 +55,10 @@ if __name__ == '__main__':
 
     # Review if running on PC or in Raspberry, to run in simulator mode or not
     os_info = platform.platform()
-    if not (re.search(r'arm', os_info[4])):
+    if not (re.search(r'arm', os_info)):
         args.simulator = True
+    else:
+        args.simulator = False
 
     # Init Database
     if args.db_path:
@@ -95,11 +93,6 @@ if __name__ == '__main__':
     else:
         flask_thread = threading.Thread(target=flask_main)
     flask_thread.start()
-
-    # # Cloud synchronizer
-    # if args.cloud:
-    #     cloud = CloudSynchronizer()
-    #     cloud.start()
 
     barcode_in = BarcodeReader(topic="door/barcode/in", port="/dev/ttyACM0")
     barcode_out = BarcodeReader(topic="door/barcode/out", port="/dev/ttyACM1")

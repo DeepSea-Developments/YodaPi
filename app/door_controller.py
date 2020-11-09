@@ -1,7 +1,7 @@
 try:
     import RPi.GPIO as GPIO
-except:
-    pass
+except Exception as e:
+    print(e)
 import time
 from scripts.ymq import YSubNode, YPubNode, YPubSubNode
 from scripts.barcode_reader import BarcodeType
@@ -20,7 +20,9 @@ class DoorActuator:
         self.activation_time = activation_time
         self.actuator_polarity = actuator_polarity
         self.verbose = verbose
+
         GPIO.setmode(GPIO.BCM)
+        GPIO.setwarnings(False)
         GPIO.setup(self.gpio, GPIO.OUT)
         if self.actuator_polarity:
             GPIO.output(self.gpio, GPIO.HIGH)
