@@ -278,24 +278,40 @@ class MainDoorController:
                     # ------------- Evaluate QR codes -------------
                     if dict_data["barcode_type"] == BarcodeType.QR.value:
                         print("Reading QR")
-                        r = self.api.open_door(dict_data['data']['identification'],
-                                               door_dir,
-                                               dict_data["barcode_type"],
-                                               dict_data["data"]["extra_txt"])
-                        if json.loads(r.text)['is_valid']:
-                            self.pub_node.post("open", "door/actuator")
-                        else:
-                            print(f"{dict_data['data']['name']} Not valid")
+                        barcode_params = {'document': dict_data['data']['identification'],
+                                          'door_dir': door_dir,
+                                          'barcode_type': dict_data["barcode_type"],
+                                          'qr_code': dict_data["data"]["extra_txt"]}
+
+                        # r = self.api.open_door(dict_data['data']['identification'],
+                        #                        door_dir,
+                        #                        dict_data["barcode_type"],
+                        #                        dict_data["data"]["extra_txt"])
+                        # if json.loads(r.text)['is_valid']:
+                        #     self.pub_node.post("open", "door/actuator")
+                        # else:
+                        #     print(f"{dict_data['data']['name']} Not valid")
                     # ------------- Evaluate Cedula codes -------------
                     elif dict_data["barcode_type"] == BarcodeType.CEDULA_COLOMBIA.value:
                         print("Reading Cedula")
-                        r = self.api.open_door(dict_data['data']['identification'],
-                                               door_dir,
-                                               dict_data["barcode_type"])
-                        if json.loads(r.text)['is_valid']:
-                            self.pub_node.post("open", "door/actuator")
-                        else:
-                            print(f"{dict_data['data']['name']} Not valid")
+                        barcode_params = {'document': dict_data['data']['identification'],
+                                          'door_dir': door_dir,
+                                          'barcode_type': dict_data["barcode_type"]}
+
+                        # r = self.api.open_door(dict_data['data']['identification'],
+                        #                        door_dir,
+                        #                        dict_data["barcode_type"])
+                        # if json.loads(r.text)['is_valid']:
+                        #     self.pub_node.post("open", "door/actuator")
+                        # else:
+                        #     print(f"{dict_data['data']['name']} Not valid")
+                    # -------------- Evaluate barcodes -----------------
+                    r = self.api.open_door(**barcode_params)
+                    if json.loads(r.text)['is_valid']:
+                        self.pub_node.post("open", "door/actuator")
+                    else:
+                        print(f"{barcode_params['name']} Not valid")
+
                 barcode_message = False
 
     def start(self):

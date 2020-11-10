@@ -25,36 +25,52 @@ class ApiConnector:
         self.api_get_db_changes = self.conf.get("api_get_db_changes")
 
     def get_database(self):
-        params = {'id_door': self.door_id}
-        url = self.url + self.api_get_users.format(**params)
-        print(url)
-        r = requests.get(url,
-                         headers=self.headers)
-        return r
+        try:
+            params = {'id_door': self.door_id}
+            url = self.url + self.api_get_users.format(**params)
+            print(url)
+            r = requests.get(url,
+                             headers=self.headers)
+            return r
+        except requests.exceptions.ConnectionError:
+            raise requests.exceptions.ConnectionError
+        except Exception as e:
+            print("api.get_database error: ", e)
 
     def open_door(self, document, door_dir, barcode_type, qr_code=""):
         print(qr_code)
-        base64_qr = base64.b64encode(qr_code.encode("ascii")).decode("utf-8")
-        params = {'id_door': self.door_id,
-                  'document': document,
-                  'action': door_dir,
-                  'qr_base64': base64_qr}
-        if barcode_type == BarcodeType.QR.value:
-            url = self.url + self.api_get_open_door_qr.format(**params)
-        else:
-            url = self.url + self.api_get_open_door_id.format(**params)
-        print(url)
-        r = requests.get(url,
-                         headers=self.headers)
-        return r
+        try:
+            base64_qr = base64.b64encode(qr_code.encode("ascii")).decode("utf-8")
+            params = {'id_door': self.door_id,
+                      'document': document,
+                      'action': door_dir,
+                      'qr_base64': base64_qr}
+            if barcode_type == BarcodeType.QR.value:
+                url = self.url + self.api_get_open_door_qr.format(**params)
+            else:
+                url = self.url + self.api_get_open_door_id.format(**params)
+            print(url)
+            r = requests.get(url,
+                             headers=self.headers)
+            return r
+
+        except requests.exceptions.ConnectionError:
+            raise requests.exceptions.ConnectionError
+        except Exception as e:
+            print("api.open_door error: ", e)
 
     def close_door(self):
-        params = {'id_door': self.door_id}
-        url = self.url + self.api_post_close.format(**params)
-        print(url)
-        r = requests.post(url,
-                          headers=self.headers)
-        return r
+        try:
+            params = {'id_door': self.door_id}
+            url = self.url + self.api_post_close.format(**params)
+            print(url)
+            r = requests.post(url,
+                              headers=self.headers)
+            return r
+        except requests.exceptions.ConnectionError:
+            raise requests.exceptions.ConnectionError
+        except Exception as e:
+            print("api.close_door error: ", e)
 
     def door_status_verification(self):
         try:
