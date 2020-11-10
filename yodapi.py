@@ -77,10 +77,10 @@ if __name__ == '__main__':
         door_actuator = DoorActuator(topic="door/actuator")
         door_actuator.start()
 
-        door_sensor = DoorSensor(topic="door/sensor")
+        door_sensor = DoorSensor(topic="door/sensor", gpio=3)
         door_sensor.start()
 
-        door_button = DoorButton(topic="door/button", gpio=3)
+        door_button = DoorButton(topic="door/button", gpio=2)
         door_button.start()
 
         door_master_button = DoorButton(topic="door/masterbutton", gpio=4)
