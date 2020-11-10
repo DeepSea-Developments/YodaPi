@@ -117,10 +117,14 @@ class DoorActuator:
     def _thread(self):
         print("DoorActuator init")
         while True:
-            data, topic = self.node.get()
-            print(f"DoorActuator topic: {topic} -> message:{data}")
-            if topic == self.topic:
-                self.open()
+            try:
+                data, topic = self.node.get()
+                print(f"DoorActuator topic: {topic} -> message:{data}")
+                if topic == self.topic:
+                    self.open()
+            except Exception as e:
+                print("Door actuator error: ",e)
+                time.sleep(1)
 
     def start(self):
         self.thread.start()
@@ -147,26 +151,29 @@ class DoorSensor:
         print("DoorSensor init")
         sensor_state = GPIO.input(self.gpio)
         while True:
-            if sensor_state != GPIO.input(self.gpio):
-                sensor_state = GPIO.input(self.gpio)
-                if sensor_state:
-                    if self.polarity:
-                        if self.verbose:
-                            print("DoorSensor: Close")
-                        self.node.post('close', self.topic)
+            try:
+                if sensor_state != GPIO.input(self.gpio):
+                    sensor_state = GPIO.input(self.gpio)
+                    if sensor_state:
+                        if self.polarity:
+                            if self.verbose:
+                                print("DoorSensor: Close")
+                            self.node.post('close', self.topic)
+                        else:
+                            if self.verbose:
+                                print("DoorSensor: Open")
+                            self.node.post('open', self.topic)
                     else:
-                        if self.verbose:
-                            print("DoorSensor: Open")
-                        self.node.post('open', self.topic)
-                else:
-                    if self.polarity:
-                        if self.verbose:
-                            print("DoorSensor: Open")
-                        self.node.post('open', self.topic)
-                    else:
-                        if self.verbose:
-                            print("DoorSensor: Close")
-                        self.node.post('close', self.topic)
+                        if self.polarity:
+                            if self.verbose:
+                                print("DoorSensor: Open")
+                            self.node.post('open', self.topic)
+                        else:
+                            if self.verbose:
+                                print("DoorSensor: Close")
+                            self.node.post('close', self.topic)
+            except Exception as e:
+                print("DoorSensor error: ", e)
             time.sleep(0.5)
 
     def start(self):
@@ -193,20 +200,23 @@ class DoorButton:
     def _thread(self):
         print("DoorButton init")
         while True:
-            if self.polarity:
-                if GPIO.input(self.gpio):
-                    if self.verbose:
-                        print("DoorButton: pushed")
-                    self.node.post('pushed', self.topic)
-                    while GPIO.input(self.gpio):
-                        time.sleep(0.5)
-            else:
-                if not GPIO.input(self.gpio):
-                    if self.verbose:
-                        print("DoorButton: pushed")
-                    self.node.post('pushed', self.topic)
-                    while not GPIO.input(self.gpio):
-                        time.sleep(0.5)
+            try:
+                if self.polarity:
+                    if GPIO.input(self.gpio):
+                        if self.verbose:
+                            print("DoorButton: pushed")
+                        self.node.post('pushed', self.topic)
+                        while GPIO.input(self.gpio):
+                            time.sleep(0.5)
+                else:
+                    if not GPIO.input(self.gpio):
+                        if self.verbose:
+                            print("DoorButton: pushed")
+                        self.node.post('pushed', self.topic)
+                        while not GPIO.input(self.gpio):
+                            time.sleep(0.5)
+            except Exception as e:
+                print("DoorButton error:", e)
             time.sleep(0.3)
 
     def start(self):
@@ -253,66 +263,64 @@ class MainDoorController:
         print("Main Door Controller Init")
         barcode_message = False
         while True:
-            message, topic = self.sub_node.get()
+            try:
+                message, topic = self.sub_node.get()
 
 
-            # -------------Open door if available barcode -------------
-            if topic == 'door/barcode/in':
-                door_dir = 1
-                barcode_message = True
-            elif topic == 'door/barcode/out':
-                door_dir = 2
-                barcode_message = True
+                # -------------Open door if available barcode -------------
+                if topic == 'door/barcode/in':
+                    door_dir = 1
+                    barcode_message = True
+                elif topic == 'door/barcode/out':
+                    door_dir = 2
+                    barcode_message = True
 
-            # -------------Open door if Button or master button pressed-------------
-            elif topic == 'door/button':
-                self.pub_node.post("open", "door/actuator")
-            elif topic == 'door/masterbutton':
-                self.pub_node.post("open", "door/actuator")
+                # -------------Open door if Button or master button pressed-------------
+                elif topic == 'door/button':
+                    self.pub_node.post("open", "door/actuator")
+                elif topic == 'door/masterbutton':
+                    self.pub_node.post("open", "door/actuator")
 
-            # ------------- Evaluate barcode reading -------------
-            if barcode_message:
-                dict_data = eval(message)
+                # ------------- Evaluate barcode reading -------------
+                if barcode_message:
+                    dict_data = eval(message)
 
-                if "barcode_type" in dict_data.keys():
-                    # ------------- Evaluate QR codes -------------
-                    if dict_data["barcode_type"] == BarcodeType.QR.value:
-                        print("Reading QR")
-                        barcode_params = {'document': dict_data['data']['identification'],
-                                          'door_dir': door_dir,
-                                          'barcode_type': dict_data["barcode_type"],
-                                          'qr_code': dict_data["data"]["extra_txt"]}
+                    if "barcode_type" in dict_data.keys():
+                        # ------------- config params of QR codes -------------
+                        if dict_data["barcode_type"] == BarcodeType.QR.value:
+                            print("Reading QR")
+                            barcode_params = {'document': dict_data['data']['identification'],
+                                              'door_dir': door_dir,
+                                              'barcode_type': dict_data["barcode_type"],
+                                              'qr_code': dict_data["data"]["extra_txt"]}
+                        # ------------- config params of  Cedula codes -------------
+                        elif dict_data["barcode_type"] == BarcodeType.CEDULA_COLOMBIA.value:
+                            print("Reading Cedula")
+                            barcode_params = {'document': dict_data['data']['identification'],
+                                              'door_dir': door_dir,
+                                              'barcode_type': dict_data["barcode_type"]}
+                        # -------------- Evaluate barcodes -----------------
 
-                        # r = self.api.open_door(dict_data['data']['identification'],
-                        #                        door_dir,
-                        #                        dict_data["barcode_type"],
-                        #                        dict_data["data"]["extra_txt"])
-                        # if json.loads(r.text)['is_valid']:
-                        #     self.pub_node.post("open", "door/actuator")
-                        # else:
-                        #     print(f"{dict_data['data']['name']} Not valid")
-                    # ------------- Evaluate Cedula codes -------------
-                    elif dict_data["barcode_type"] == BarcodeType.CEDULA_COLOMBIA.value:
-                        print("Reading Cedula")
-                        barcode_params = {'document': dict_data['data']['identification'],
-                                          'door_dir': door_dir,
-                                          'barcode_type': dict_data["barcode_type"]}
+                        try:
+                            r = self.api.open_door(**barcode_params)
+                            if json.loads(r.text)['is_valid']:
+                                self.pub_node.post("open", "door/actuator")
+                            else:
+                                print(f"{barcode_params['name']} Not valid")
+                        except requests.exceptions.ConnectionError:
+                            # Could not connect to cloud. Trying local database
+                            db_session = db.SessionLocal()
+                            query = db_session.query(models.AuthUser).filter_by(document=barcode_params['document']).first()
+                            print(query)
+                            if query:
+                                self.pub_node.post("open", "door/actuator")
+                        except Exception as e:
+                            print("MainDoor controller. Validating barcode error: ", e)
 
-                        # r = self.api.open_door(dict_data['data']['identification'],
-                        #                        door_dir,
-                        #                        dict_data["barcode_type"])
-                        # if json.loads(r.text)['is_valid']:
-                        #     self.pub_node.post("open", "door/actuator")
-                        # else:
-                        #     print(f"{dict_data['data']['name']} Not valid")
-                    # -------------- Evaluate barcodes -----------------
-                    r = self.api.open_door(**barcode_params)
-                    if json.loads(r.text)['is_valid']:
-                        self.pub_node.post("open", "door/actuator")
-                    else:
-                        print(f"{barcode_params['name']} Not valid")
-
-                barcode_message = False
+                    barcode_message = False
+            except Exception as e:
+                print("controller error: ", e)
+                time.sleep(1)
 
     def start(self):
         self.thread.start()
