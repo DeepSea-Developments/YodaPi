@@ -237,6 +237,8 @@ class RemoteDoorControl:
                 r = self.api.door_status_verification()
                 if json.loads(r.text)['is_open']:
                     self.pub_node.post("open", "door/actuator")
+                    time.sleep(0.1)
+                    self.pub_node.post("open", "door/buzzer/long_buzz")
                     r = self.api.close_door()
             except requests.exceptions.ConnectionError:
                 print("RemoteDoorControl failed. No connection to server")
