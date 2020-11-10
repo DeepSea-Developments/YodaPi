@@ -35,7 +35,7 @@ class DoorActuator:
     def open(self):
         # Review if Activation time is None
         if self.auto_update_values:
-            self.activation_time = load_config().get("actuator_time")
+            self.activation_time = int(load_config().get("actuator_time"))
         if self.actuator_polarity:
             GPIO.output(self.gpio, GPIO.LOW)
         else:
