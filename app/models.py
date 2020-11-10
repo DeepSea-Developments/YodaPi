@@ -23,6 +23,21 @@ class EventType(enum.Enum):
     door_close = 7
 
 
+class DBUpdateDate(db.Base):
+    __tablename__ = 'UpdateDate'
+    id = Column(Integer, primary_key=True)
+    last_update = Column(String, nullable=False)
+
+    def __init__(self, last_update):
+        self.last_update = last_update
+
+    def __repr__(self):
+        return f'User({self.last_update})'
+
+    def __str__(self):
+        return self.last_update
+
+
 class AuthUser(db.Base):
     __tablename__ = 'AllowList'
     id = Column(Integer, primary_key=True)

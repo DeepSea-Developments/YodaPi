@@ -64,7 +64,7 @@ if __name__ == '__main__':
     if args.db_path:
         db.init(conf.get(args.db_path))
     else:
-        db.init(conf.get('db_path'))
+        db.init()
 
     yserver = YServer(verbose=True)
     yserver.start()

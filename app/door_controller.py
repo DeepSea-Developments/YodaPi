@@ -8,11 +8,15 @@ from scripts.barcode_reader import BarcodeType
 import threading
 from datetime import datetime
 from app.api import ApiConnector
+from scripts.helpers import load_config
 import json
 
 
+# class LocalDatabaseUpdater:
+#     def __init__(self):
+
 class DoorActuator:
-    def __init__(self, topic="door/actuator", actuator_polarity=0, activation_time=3, gpio=26, verbose=True):
+    def __init__(self, topic="door/actuator", actuator_polarity=0, activation_time=3, auto_update_values=True, gpio=26, verbose=True):
         self.thread = threading.Thread(target=self._thread)
         self.gpio = gpio
         self.topic = topic
@@ -28,6 +32,9 @@ class DoorActuator:
             GPIO.output(self.gpio, GPIO.HIGH)
 
     def open(self):
+        # Review if Activation time is None
+        if self.auto_update_values:
+            self.activation_time = load_config().get("actuator_time")
         if self.actuator_polarity:
             GPIO.output(self.gpio, GPIO.LOW)
         else:

@@ -61,15 +61,20 @@
     ]
   },
   {
-    "tab_name": "Door configuration",
-    "tab_id": "door-configuration",
+    "tab_name": "Device configuration",
+    "tab_id": "device-configuration",
     "tab_data": [
       {
         "section_name": "Basic configurations",
         "section_data": [
           {
             "param_id": "actuator_time",
-            "param_name": "Door actuator time",
+            "param_name": "Door actuator time (in seconds)",
+            "param_type": "number"
+          },
+          {
+            "param_id": "local_db_update_min",
+            "param_name": "Local database update time (in minutes)",
             "param_type": "number"
           }
         ]
