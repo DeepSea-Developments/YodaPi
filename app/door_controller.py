@@ -379,9 +379,9 @@ class Buzzer:
 
         if self.verbose:
             print(f"{datetime.now()}: Buzzer: Activated")
-        self.buzz(0.5)
-        time.sleep(0.5)
-        self.buzz(0.5)
+        self.buzz(0.2)
+        time.sleep(0.2)
+        self.buzz(0.2)
         if self.verbose:
             print(f"{datetime.now()}: Buzzer: Deactivated")
 
