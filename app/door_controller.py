@@ -24,6 +24,7 @@ class DoorActuator:
         self.activation_time = activation_time
         self.actuator_polarity = actuator_polarity
         self.verbose = verbose
+        self.auto_update_values = auto_update_values
 
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
