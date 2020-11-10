@@ -312,7 +312,7 @@ class MainDoorController:
                                 self.pub_node.post("open", "door/actuator")
                                 self.pub_node.post("authorized", "door/buzzer/long_buzz")
                             else:
-                                print(f"{barcode_params['name']} Not valid")
+                                print(f"{dict_data['data']['name']} Not valid")
                                 self.pub_node.post("unauthorized", "door/buzzer/two_short_buzzes")
                         except requests.exceptions.ConnectionError:
                             # Could not connect to cloud. Trying local database
@@ -387,6 +387,7 @@ class Buzzer:
 
     def _thread(self):
         print("Buzzer init")
+        GPIO.output(self.gpio, GPIO.LOW)
         while True:
             try:
                 data, topic = self.node.get()
