@@ -87,7 +87,7 @@ if __name__ == '__main__':
         door_master_button.start()
 
         door_buzzer = Buzzer(topic="door/buzzer")
-        door_button.start()
+        door_buzzer.start()
 
     else:  # Use in Computer
         print(pc_mode)
