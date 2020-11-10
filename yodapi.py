@@ -7,7 +7,7 @@ from scripts.barcode_reader import BarcodeReader
 from scripts.helpers import get_args, disable_logging, load_config
 from yodapi_flask import flask_main
 from app.door_controller import DoorActuator, MainDoorController, DoorSensor, DoorButton, RemoteDoorControl, \
-                                LocalDatabaseUpdater
+                                LocalDatabaseUpdater, Buzzer
 
 import scripts.db as db
 from scripts.ymq import YServer
@@ -85,6 +85,9 @@ if __name__ == '__main__':
 
         door_master_button = DoorButton(topic="door/masterbutton", gpio=4)
         door_master_button.start()
+
+        door_buzzer = Buzzer(topic="door/buzzer")
+        door_button.start()
 
     else:  # Use in Computer
         print(pc_mode)

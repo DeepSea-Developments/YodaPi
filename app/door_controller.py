@@ -247,6 +247,7 @@ class RemoteDoorControl:
     def start(self):
         self.thread.start()
 
+
 class MainDoorController:
     def __init__(self):
         self.thread = threading.Thread(target=self._thread)
@@ -278,8 +279,10 @@ class MainDoorController:
                 # -------------Open door if Button or master button pressed-------------
                 elif topic == 'door/button':
                     self.pub_node.post("open", "door/actuator")
+                    self.pub_node.post("authorized", "door/buzzer/long_buzz")
                 elif topic == 'door/masterbutton':
                     self.pub_node.post("open", "door/actuator")
+                    self.pub_node.post("authorized", "door/buzzer/long_buzz")
 
                 # ------------- Evaluate barcode reading -------------
                 if barcode_message:
@@ -305,8 +308,10 @@ class MainDoorController:
                             r = self.api.open_door(**barcode_params)
                             if json.loads(r.text)['is_valid']:
                                 self.pub_node.post("open", "door/actuator")
+                                self.pub_node.post("authorized", "door/buzzer/long_buzz")
                             else:
                                 print(f"{barcode_params['name']} Not valid")
+                                self.pub_node.post("unauthorized", "door/buzzer/two_short_buzzes")
                         except requests.exceptions.ConnectionError:
                             # Could not connect to cloud. Trying local database
                             db_session = db.SessionLocal()
@@ -320,6 +325,76 @@ class MainDoorController:
                     barcode_message = False
             except Exception as e:
                 print("controller error: ", e)
+                time.sleep(1)
+
+    def start(self):
+        self.thread.start()
+
+
+class Buzzer:
+    def __init__(self, topic="door/buzzer", buzzer_polarity=0, activation_time=3, auto_update_values=True, gpio=13, verbose=True):
+        self.thread = threading.Thread(target=self._thread)
+        self.gpio = gpio
+        self.topic = topic
+        self.node = YSubNode(topic)
+        self.activation_time = activation_time
+        self.actuator_polarity = buzzer_polarity
+        self.verbose = verbose
+        self.auto_update_values = auto_update_values
+
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setwarnings(False)
+        GPIO.setup(self.gpio, GPIO.OUT)
+        if self.actuator_polarity:
+            GPIO.output(self.gpio, GPIO.HIGH)
+
+    def buzz(self, time):
+
+        if self.actuator_polarity:
+            GPIO.output(self.gpio, GPIO.LOW)
+        else:
+            GPIO.output(self.gpio, GPIO.HIGH)
+
+        time.sleep(time)
+
+        if self.actuator_polarity:
+            GPIO.output(self.gpio, GPIO.HIGH)
+        else:
+            GPIO.output(self.gpio, GPIO.LOW)
+
+    def long_buzz(self):
+        # Review if Activation time is None
+        if self.auto_update_values:
+            self.activation_time = int(load_config().get("actuator_time"))
+
+        if self.verbose:
+            print(f"{datetime.now()}: Buzzer: Activated")
+        self.buzz(self.activation_time)
+        if self.verbose:
+            print(f"{datetime.now()}: Buzzer: Deactivated")
+
+    def two_short_buzzes(self):
+
+        if self.verbose:
+            print(f"{datetime.now()}: Buzzer: Activated")
+        self.buzz(0.2)
+        time.sleep(0.2)
+        self.buzz(0.2)
+        if self.verbose:
+            print(f"{datetime.now()}: Buzzer: Deactivated")
+
+    def _thread(self):
+        print("Buzzer init")
+        while True:
+            try:
+                data, topic = self.node.get()
+                print(f"Buzzer topic: {topic} -> message:{data}")
+                if topic == self.topic + "/long_buzz":
+                    self.long_buzz()
+                elif topic == self.topic + "/two_short_buzzes":
+                    self.two_short_buzzes()
+            except Exception as e:
+                print("Door Buzzer error: ", e)
                 time.sleep(1)
 
     def start(self):
