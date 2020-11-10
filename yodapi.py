@@ -6,7 +6,8 @@ import platform
 from scripts.barcode_reader import BarcodeReader
 from scripts.helpers import get_args, disable_logging, load_config
 from yodapi_flask import flask_main
-from app.door_controller import DoorActuator, MainDoorController, DoorSensor, DoorButton, RemoteDoorControl
+from app.door_controller import DoorActuator, MainDoorController, DoorSensor, DoorButton, RemoteDoorControl, \
+                                LocalDatabaseUpdater
 
 import scripts.db as db
 from scripts.ymq import YServer
@@ -107,3 +108,6 @@ if __name__ == '__main__':
 
     remote_door_control = RemoteDoorControl()
     remote_door_control.start()
+
+    local_database_updater = LocalDatabaseUpdater()
+    local_database_updater.start()

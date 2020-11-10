@@ -10,10 +10,74 @@ from datetime import datetime
 from app.api import ApiConnector
 from scripts.helpers import load_config
 import json
+import scripts.db as db
+import app.models as models
+import requests
 
 
-# class LocalDatabaseUpdater:
-#     def __init__(self):
+class LocalDatabaseUpdater:
+    def __init__(self, update_time_min = 60, auto_update_values=True):
+        self.update_time_min = update_time_min
+        self.auto_update_values = auto_update_values
+        self.api = ApiConnector()
+        self.thread = threading.Thread(target=self._thread)
+
+    def _thread(self):
+        print("LocalDatabaseUpdater init")
+        while True:
+            try:
+                if self.auto_update_values:
+                    self.update_time_min = int(load_config().get("local_db_update_min"))
+
+                print("Checking if local database needs to be updated")
+
+                db_session = db.SessionLocal()
+                query = db_session.query(models.DBUpdateDate).first()
+                r = self.api.get_last_db_change()
+
+                remote_db_last_update = json.loads(r.text)["last_change"]
+
+                update_db = False
+
+                # Review if there if there is a local database
+                if query is not None:
+                    if query.last_update != remote_db_last_update:
+                        print("Remote database changed")
+                        query.last_update = remote_db_last_update
+                        update_db = True
+                        query = db_session.query(models.AuthUser).delete()
+
+                # Create a new database
+                else:
+                    print("Database created for the fist time")
+                    last_database_update = models.DBUpdateDate(remote_db_last_update)
+                    db_session.add(last_database_update)
+                    update_db = True
+
+                if update_db:
+                    r = self.api.get_database()
+                    print(r.text)
+                    for user in json.loads(r.text):
+                        print(user)
+                        auth_user = models.AuthUser(name=user["name"],
+                                                    document=user["document"],
+                                                    access_key=user["access_key"])
+                        db_session.add(auth_user)
+
+                db_session.commit()
+                db_session.close()
+
+                time.sleep(60 * self.update_time_min)
+            except requests.exceptions.ConnectionError:
+                print("Remote database check failed. No connection to server")
+                time.sleep(6 * 15)
+            except Exception as e:
+                print("LocalDatabaseUpdater Error: ", e)
+                time.sleep(60)
+
+    def start(self):
+        self.thread.start()
+
 
 class DoorActuator:
     def __init__(self, topic="door/actuator", actuator_polarity=0, activation_time=3, auto_update_values=True, gpio=26, verbose=True):
@@ -159,10 +223,15 @@ class RemoteDoorControl:
     def _thread(self):
         print("RemoteDoorControl init")
         while True:
-            r = self.api.door_status_verification()
-            if json.loads(r.text)['is_open']:
-                self.pub_node.post("open", "door/actuator")
-                r = self.api.close_door()
+            try:
+                r = self.api.door_status_verification()
+                if json.loads(r.text)['is_open']:
+                    self.pub_node.post("open", "door/actuator")
+                    r = self.api.close_door()
+            except requests.exceptions.ConnectionError:
+                print("RemoteDoorControl failed. No connection to server")
+            except Exception as e:
+                print("Remote Door Control error: ", e)
             time.sleep(self.sleep_time)
 
     def start(self):

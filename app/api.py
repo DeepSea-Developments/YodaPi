@@ -57,17 +57,27 @@ class ApiConnector:
         return r
 
     def door_status_verification(self):
-        params = {'id_door': self.door_id}
-        url = self.url + self.api_get_remote_open.format(**params)
-        print(url)
-        r = requests.get(url,
-                         headers=self.headers)
-        return r
+        try:
+            params = {'id_door': self.door_id}
+            url = self.url + self.api_get_remote_open.format(**params)
+            print(url)
+            r = requests.get(url,
+                             headers=self.headers)
+            return r
+        except requests.exceptions.ConnectionError:
+            raise requests.exceptions.ConnectionError
+        except Exception as e:
+            print("api.door_status_verification error: ", e)
 
     def get_last_db_change(self):
-        params = {'id_door': self.door_id}
-        url = self.url + self.api_get_db_changes.format(**params)
-        print(url)
-        r = requests.get(url,
-                         headers=self.headers)
-        return r
+        try:
+            params = {'id_door': self.door_id}
+            url = self.url + self.api_get_db_changes.format(**params)
+            print(url)
+            r = requests.get(url,
+                             headers=self.headers)
+            return r
+        except requests.exceptions.ConnectionError:
+            raise requests.exceptions.ConnectionError
+        except Exception as e:
+            print("api.get_last_db_change error: ", e)
