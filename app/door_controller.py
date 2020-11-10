@@ -350,14 +350,14 @@ class Buzzer:
         if self.actuator_polarity:
             GPIO.output(self.gpio, GPIO.HIGH)
 
-    def buzz(self, time):
+    def buzz(self, buzz_time):
 
         if self.actuator_polarity:
             GPIO.output(self.gpio, GPIO.LOW)
         else:
             GPIO.output(self.gpio, GPIO.HIGH)
 
-        time.sleep(time)
+        time.sleep(buzz_time)
 
         if self.actuator_polarity:
             GPIO.output(self.gpio, GPIO.HIGH)
@@ -379,9 +379,9 @@ class Buzzer:
 
         if self.verbose:
             print(f"{datetime.now()}: Buzzer: Activated")
-        self.buzz(0.2)
-        time.sleep(0.2)
-        self.buzz(0.2)
+        self.buzz(0.5)
+        time.sleep(0.5)
+        self.buzz(0.5)
         if self.verbose:
             print(f"{datetime.now()}: Buzzer: Deactivated")
 
