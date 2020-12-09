@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% set active_page = 'index' %}
+{% block title%}Live Stream{% endblock %}
+{% block head %}
+  <link rel="stylesheet" href="/static/css/index.css">
+  <script src="/static/js/index.js"></script>
+{% endblock %}
+{% block content %}
+
+<div class="container-fluid">
+  <div class="row mx-2 my-4">
+    <div class="col-md-4">
+      <div class="form-group">
+        <label class="color-grey lh-0" id="lbl_name">Nombre:</label>
+        <p class="text-large" id="name"></p>
+      </div>
+      <div class="form-group">
+        <label class="color-grey lh-0" id="lbl_identification">Cédula:</label>
+        <p class="text-large" id="identification"></p>
+      </div>
+      <div class="form-group">
+        <label class="color-grey lh-0" id="lbl_gender">Género:</label>
+        <p class="text-large" class="lead" id="gender"></p>
+      </div>
+      <div class="form-group">
+        <label class="color-grey lh-0" id="lbl_timestamp">Fecha de Ingreso:</label>
+        <p class="text-large" id="timestamp"></p>
+      </div>
+      <div class="form-group">
+        <label class="color-grey lh-0" id="lbl_birth_date">Fecha de Nacimiento:</label>
+        <p class="text-large" id="birth_date"></p>
+      </div>
+      <div class="form-group">
+        <label class="color-grey lh-0" id="lbl_document_type">Tipo de documento:</label>
+        <p class="text-large" id="document_type"></p>
+      </div>
+      <div class="form-group">
+        <label class="color-grey lh-0" id="lbl_nationality">Nacionalidad:</label>
+        <p class="text-large" id="nationality"></p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <img src="{{ url_for('video_feed') }}" class="w-100">
+    </div>
+    <div class="col-md-4">
+      <div id="captured_images" class="row pb-2">
+        <div class="col-6">
+          <img id="image_rgb" class="w-100">
+        </div>
+        <div class="col-6">
+          <img id="image_thermal" class="w-100">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="color-grey lh-0" id="lbl_temperature_body">Temperatura estimada del cuerpo:</label>
+        <p class="text-large" id="temperature_body"></p>
+      </div>
+      <div class="form-group">
+        <label class="color-grey lh-0" id="lbl_temperature_skin"></label>
+        <p class="text-large" id="temperature_skin"></p>
+      </div>
+      <div class="form-group">
+        <!-- <label class="color-grey lh-0" class="sub-title">Ingreso:</label> -->
+        <div>
+          <button type="button" class="btn btn-success alert_button display_none mt-3" id="alert_0">
+            Temperatura Aceptable
+          </button>
+          <button type="button" class="btn btn-warning alert_button display_none mt-3" id="alert_1">
+            Temperatura Elevada
+          </button>
+          <button type="button" class="btn btn-danger alert_button display_none mt-3" id="alert_2">
+            Temperatura Alta
+          </button>
+          <button type="button" class="btn btn-danger alert_button display_none mt-3" id="alert_p">
+            Alerta en Formulario
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

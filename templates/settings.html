@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% set active_page = 'configuracion' %}
+{% block title%}Configuración{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="/static/css/settings.css">
+<script src="/static/js/settings.js"></script>
+{% endblock %}
+{% block content %}
+
+
+<div class="mx-4 my-4">
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a class="nav-link active" data-toggle="tab" href="#network-settings">Configuración de conexión</a>
+    </li>
+    {%for tabs in params%}
+      <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#{{tabs.tab_id}}">{{tabs.tab_name}}</a>
+      </li>
+    {%endfor%}
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content" id="myTabContent">
+    <div class="tab-pane m-4 active" id="network-settings">
+      {% include 'settings/network.html' %}
+    </div>
+
+    {%for tabs in params%}
+      <div class="tab-pane m-4 fade" id="{{tabs.tab_id}}">
+
+        <form id="form_camera_parameters">
+          {%for sections in tabs.tab_data%}
+            <p class="h1">{{sections.section_name}}</p>
+            {%for field in sections.section_data%}
+            <div class="form-row">
+                <div class="form-group col-md-8">
+                    <label for="{{field.param_id}}"> {{field.param_name}}</label>
+                    <input type="{{field.param_type}}" step="any" class="form-control" id="{{field.param_id}}" placeholder="{{field.param_id}}" required>
+                </div>
+            </div>
+            {%endfor%}
+          {%endfor%}
+          <button type="button" class="btn btn-primary" onclick="javascript:updateParameters()">Aplicar parametros</button>
+          <button type="button" class="btn btn-secondary" onclick="javascript:getParameters_default()">Restablecer valores</button>
+        </form>
+      </div>
+    {%endfor%}
+
+    <div class="tab-pane m-4 fade" id="menu2">...</div>
+  </div>
+
+
+
+</div>
+
+
+{% endblock %}

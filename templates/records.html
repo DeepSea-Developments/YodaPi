@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% set active_page = 'registros' %}
+{% block title%}Registros{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="/static/css/records.css">
+<script src="/static/js/records.js"></script>
+{% endblock %}
+{% block content %}
+
+<div class="container-fluid">
+  <div class="row mx-2 my-4">
+    <div class="col-md-12" style="margin-bottom: 100px;">
+      <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th class="color-primary">Fecha y Hora</th>
+            <th class="color-primary">Identificación</th>
+            <th class="color-primary">Nombres</th>
+            <th class="color-primary">Apellidos</th>
+            <th class="color-primary">Temperatura °C</th>
+            <th class="color-primary">Ingreso</th>
+            <th class="color-primary">Imágen Térmica</th>
+            <th class="color-primary">Imágen Color</th>
+          </tr>
+        </thead>
+        <tbody id="table-register">
+        </tbody>
+      </table>
+      <nav class="d-flex justify-content-center">
+        <ul class="pagination" id="records_pagination">
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}
