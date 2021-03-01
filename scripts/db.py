@@ -12,7 +12,7 @@ SessionLocal = None
 def init(db_path=DEFAULT_DATABASE_PATH):
     global SessionLocal
     engine = create_engine(f'sqlite:///{db_path}',
-                           echo=True,
+                           echo=False,
                            connect_args={"check_same_thread": False})
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     Base.metadata.create_all(engine)
