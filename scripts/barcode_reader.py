@@ -10,7 +10,7 @@ import serial
 from enum import Enum
 from time import sleep
 from datetime import datetime
-from scripts.helpers import get_args, get_ports
+from scripts.helpers import get_args, get_ports, get_port_by_port_location
 from scripts.ymq import YPubNode
 import base64
 
@@ -49,15 +49,21 @@ class BarcodeReader:
     initiated = False
     args = None
 
-    def __init__(self, port=None, baudrate=115200, topic=""):
+    def __init__(self, port=None, port_location=None, baudrate=115200, topic=""):
+
+        self.port_location = port_location
+        self.baudrate = baudrate
+
+        if port_location is not None:
+            port = get_port_by_port_location(self.port_location)
+
         if port is None:
             ports = get_ports()
             for (com, desc, vid) in zip(ports[0], ports[1], ports[2]):
                 # print(com, desc, vid)
                 if vid in BarcodeReader.ports_allowlist:
                     port = com
-
-        if port is not None:
+        else:
             try:
                 self.serial = serial.Serial(port=port, baudrate=baudrate, timeout=0.5)
                 self.initiated = True
@@ -171,9 +177,25 @@ class BarcodeReader:
 
     def _thread(self):
         while True:
-            reading = self.get_reading()
-            if reading:
-                self.node.post(reading)
+            try:
+                reading = self.get_reading()
+                if reading:
+                    self.node.post(reading)
+            except Exception as e:
+                print(e)
+                print("Serial disconnected. Trying to reconnect")
+                sleep(1)
+                try:
+                    self.serial.close()
+                except Exception as e:
+                    pass
+
+                try:
+                    port = get_port_by_port_location(self.port_location)
+                    self.serial = serial.Serial(port=port, baudrate=self.baudrate, timeout=0.5)
+                    self.initiated = True
+                except Exception as e:
+                    print(e)
 
     def start(self):
         """Start the background simulator thread if it isn't running yet."""

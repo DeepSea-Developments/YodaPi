@@ -98,8 +98,8 @@ if __name__ == '__main__':
         flask_thread = threading.Thread(target=flask_main)
     flask_thread.start()
 
-    barcode_in = BarcodeReader(topic="door/barcode/in", port="/dev/ttyACM0")
-    barcode_out = BarcodeReader(topic="door/barcode/out", port="/dev/ttyACM1")
+    barcode_in = BarcodeReader(topic="door/barcode/in", port_location="1-1.1:1.0")
+    barcode_out = BarcodeReader(topic="door/barcode/out", port_location="1-1.2:1.0")
 
     if barcode_in.initiated:
         barcode_in.start()

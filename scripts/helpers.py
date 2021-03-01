@@ -92,3 +92,29 @@ def get_parameters_id_list(params):
             for field in section['section_data']:
                 param_list.append(field['param_id'])
     return param_list
+
+def get_port_by_port_location(port_location):
+    selected_port = None
+    for port in comports():
+        if port_location == port.location:
+            #print("found")
+            selected_port = port.device
+            break
+
+    return selected_port
+
+
+def get_port_complete_information():
+    for port in comports():
+        print("1. " + port.device)
+        print("2. " + port.name)
+        print("3. " + port.description)
+        print("4. " + port.hwid)
+        print("5. " + str(port.vid))
+        print("6. " + str(port.pid))
+        print("7. " + port.serial_number)
+        print("8. " + port.location)
+        print("9. " + port.manufacturer)
+        print("10. " + port.product)
+        print("11. " + str(port.interface))
+        print("---------------------")
